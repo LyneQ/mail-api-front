@@ -10,6 +10,7 @@
 	import LogIn from '@lucide/svelte/icons/log-in';
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import UserRoundPlus from '@lucide/svelte/icons/user-round-plus';
+	import Inbox from '@lucide/svelte/icons/inbox';
 
 	import { toggleMode } from 'mode-watcher';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -77,6 +78,7 @@ const pathname = page.url.pathname
 					</ul>
 				{/if}
 				{#if $isLoggedIn }
+					<Button href="/u/0/inbox" variant="outline" size="sm"> <Inbox /> Boite de réception</Button>
 					<Button href="/" onclick={() => logout()} variant="outline" size="sm"> <LogOut />se déconnecter</Button>
 					{/if}
 			</div>

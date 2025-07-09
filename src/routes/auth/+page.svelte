@@ -39,7 +39,7 @@
 				errorMessage.set(errorData.message || 'Login failed');
 				return;
 			}
-			await goto('/about')
+			await goto('/u/0/inbox')
 
 			// Optional: redirect or perform other actions
 		} catch (err) {
