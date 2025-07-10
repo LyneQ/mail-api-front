@@ -10,6 +10,10 @@
 	const accountFolders: string[] = [];
 	const inboxMessages = [];
 
+	function handleSelect(event: CustomEvent<{ path: string }>) {
+		console.log('Dossier sélectionné :', event.detail.path);
+	}
+
 	onMount(async () => {
 		try {
 			const response = await fetch(`http://localhost:1323/api/email/inbox`, {
@@ -35,7 +39,7 @@
 
 <div>
 	{#if !isLoading}
-		<Folders folders={accountFolders} />
+		<Folders folders={accountFolders} on:select={handleSelect} />
 	{/if}
 </div>
 
