@@ -43,16 +43,17 @@
 	<span>{name}</span>
 </button>
 
-{#if open && hasChildren}
-	<div class="nested">
-		{#each Object.entries(subtree) as [childName, childSubtree]}
-			<FolderNode name={childName}
-									subtree={childSubtree}
-									level={level + 1}
-									fullPath={`${fullPath}/${childName}`} />
-		{/each}
-	</div>
-{/if}
+
+	{#if open && hasChildren}
+		<div class="nested">
+			{#each Object.entries(subtree) as [childName, childSubtree]}
+				<FolderNode name={childName}
+										subtree={childSubtree}
+										level={level + 1}
+										fullPath={`${fullPath}/${childName}`} />
+			{/each}
+		</div>
+	{/if}
 
 <style>
     .chat-item {
@@ -73,7 +74,7 @@
 
     .nested {
         border-left: 1px solid #555;
-        margin-left: 0.5rem;
+        margin-left: 1.5rem;
         padding-left: 0.5rem;
     }
 

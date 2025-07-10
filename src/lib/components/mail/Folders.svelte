@@ -20,11 +20,23 @@
 
 </script>
 
-{#each Object.entries(folderTree) as [name, subtree]}
-	<FolderNode
-		name={name}
-		subtree={subtree}
-		level={0}
-		fullPath={name}
-	/>
-{/each}
+<section class="folders">
+	{#each Object.entries(folderTree) as [name, subtree]}
+		<FolderNode
+			name={name}
+			subtree={subtree}
+			level={0}
+			fullPath={name}
+		/>
+	{/each}
+</section>
+
+
+<style lang="scss">
+	.folders {
+		margin-left: 2rem;
+		border-right: 1px solid var(--border);
+		width: 20vw;
+    height: calc(100vh - 4.3rem);
+  }
+</style>
