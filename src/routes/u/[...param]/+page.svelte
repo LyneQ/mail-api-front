@@ -1,12 +1,13 @@
 <script lang="ts">
- import { page } from '$app/state';
- import Folders from '../../../lib/components/mail/Folders.svelte';
- import InboxMessages from '../../../lib/components/mail/InboxMessages.svelte';
+	import { page } from '$app/state';
+	import Folders from '../../../lib/components/mail/Folders.svelte';
+	import InboxMessages from '../../../lib/components/mail/InboxMessages.svelte';
 
 	let { data } = $props();
 	let isLoading = $state(true);
 	let currentFolderPath = $state('');
-	let accountFolders = $state<string[]>([]);
+	let specialFolders = $state<string[]>([]);
+	let regularFolders = $state<string[]>([]);
 	let inboxMessages = $state([]);
 	let mailBox = $state(null);
 
@@ -14,7 +15,7 @@
 	async function fetchData(folderPath: string) {
 		isLoading = true;
 		try {
-			// Fetch folders
+
 			const inboxResponse = await fetch(`http://localhost:1323/api/email/inbox`, {
 				method: 'GET',
 				credentials: 'include'
@@ -22,22 +23,29 @@
 
 			if (inboxResponse.status === 200) {
 				const body = await inboxResponse.json();
-				accountFolders = [];
 
+
+				specialFolders = ['inbox', 'sent', 'drafts', 'trash', 'spam'];
+
+
+				regularFolders = [];
 				if (body && body.folders && Array.isArray(body.folders)) {
 					const foldersWithPrefix = body.folders.filter((folder: string) => folder.startsWith('Folders/'));
 
 					if (foldersWithPrefix.length > 0) {
-						const filteredFolders = foldersWithPrefix.map((folder: string) => folder.replace('Folders/', ''));
-						accountFolders.push(...filteredFolders);
+						regularFolders = foldersWithPrefix.map((folder: string) => folder.replace('Folders/', ''));
 					} else {
-						accountFolders.push(...body.folders);
+						regularFolders = body.folders;
 					}
 				}
 			} else {
 				console.log('API request failed with status:', inboxResponse.status);
 			}
-			const folderName = folderPath === "inbox" ? "Inbox" : `Folders/${folderPath}`;
+
+			const specialFoldersList = ['inbox', 'sent', 'drafts', 'trash', 'spam'];
+			const folderName = specialFoldersList.includes(folderPath.toLowerCase()) 
+				? folderPath.charAt(0).toUpperCase() + folderPath.slice(1)
+				: `Folders/${folderPath}`;
 			const messagesResponse = await fetch(`http://localhost:1323/api/email/folder?name=${folderName}`, {
 				method: 'GET',
 				credentials: 'include'
@@ -71,8 +79,8 @@
 <div class="mail-container">
 	{#if !isLoading}
 		<div class="sidebar">
-			{#if accountFolders.length > 0}
-				<Folders folders={accountFolders} />
+			{#if specialFolders.length > 0 || regularFolders.length > 0}
+				<Folders specialFolders={specialFolders} regularFolders={regularFolders} />
 			{:else}
 				<div class="empty-folders">No folders found</div>
 			{/if}

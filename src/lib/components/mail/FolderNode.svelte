@@ -1,9 +1,15 @@
 <script lang="ts">
-	import FolderNode from './FolderNode.svelte';
+ import FolderNode from './FolderNode.svelte';
 	import Folder from '@lucide/svelte/icons/folder';
 	import File from '@lucide/svelte/icons/file';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import Inbox from '@lucide/svelte/icons/inbox';
+	import Mail from '@lucide/svelte/icons/mail';
+	import MailPlus from '@lucide/svelte/icons/mail-plus';
+	import MailOpen from '@lucide/svelte/icons/mail-open';
+	import MailX from '@lucide/svelte/icons/mail-x';
+	import MailWarning from '@lucide/svelte/icons/mail-warning';
 	import { goto } from '$app/navigation';
 	import { openFolders, toggleFolder } from '../../stores/folderStore';
 
@@ -20,13 +26,12 @@
 	let selectedFolder = $state();
 	let hasChildren = Object.keys(subtree).length > 0;
 
-	// Subscribe to the openFolders store
 	let isOpen = $state(false);
 
-	// Update isOpen when the store changes
+
 	$effect(() => {
 		const newIsOpen = $openFolders.has(fullPath);
-		// Only update if the value has changed to prevent unnecessary re-renders
+
 		if (isOpen !== newIsOpen) {
 			isOpen = newIsOpen;
 		}
@@ -34,11 +39,10 @@
 
 	function handleClick() {
 		if (hasChildren) {
-			// Toggle the folder in the store
+
 			toggleFolder(fullPath);
 		}
 
-		// Only navigate if we're not already on this path
 		const currentPath = window.location.pathname;
 		const targetPath = `/u/0/${fullPath}`;
 
@@ -57,14 +61,26 @@
 			{:else}
 				<ChevronRight size="16" />
 			{/if}
-    {:else}
-      <File size="16" />
+
+
     {/if}
   </span>
 
 	<span class="folder-icon">
-    {#if hasChildren}
+    {#if name.toLowerCase() === 'inbox'}
+      <Inbox size="16" />
+    {:else if name.toLowerCase() === 'draft'}
+      <MailPlus size="16" />
+    {:else if name.toLowerCase() === 'sent'}
+      <MailOpen size="16" />
+    {:else if name.toLowerCase() === 'trash'}
+      <MailX size="16" />
+    {:else if name.toLowerCase() === 'spam'}
+      <MailWarning size="16" />
+    {:else if hasChildren}
       <Folder size="16" />
+    {:else}
+      <Mail size="16" />
     {/if}
   </span>
 
