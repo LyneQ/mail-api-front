@@ -4,27 +4,55 @@
 	import File from '@lucide/svelte/icons/file';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import { goto } from '$app/navigation';
+	import { openFolders, toggleFolder } from '../../stores/folderStore';
 
 
-	export let name: string;
-	export let subtree: Record<string, any>;
-	export let level: number;
-	export let fullPath: string = name;
+	const {
+		name = '',
+		subtree = {},
+		level = 0,
+		fullPath = name,
+		inflate = () => {
+		}
+	} = $props();
 
-
-	let open = false;
+	let selectedFolder = $state();
 	let hasChildren = Object.keys(subtree).length > 0;
 
+	// Subscribe to the openFolders store
+	let isOpen = $state(false);
+
+	// Update isOpen when the store changes
+	$effect(() => {
+		const newIsOpen = $openFolders.has(fullPath);
+		// Only update if the value has changed to prevent unnecessary re-renders
+		if (isOpen !== newIsOpen) {
+			isOpen = newIsOpen;
+		}
+	});
+
 	function handleClick() {
-		console.info(fullPath);
-		if (hasChildren) open = !open;
+		if (hasChildren) {
+			// Toggle the folder in the store
+			toggleFolder(fullPath);
+		}
+
+		// Only navigate if we're not already on this path
+		const currentPath = window.location.pathname;
+		const targetPath = `/u/0/${fullPath}`;
+
+		if (currentPath !== targetPath) {
+			inflate(fullPath);
+			goto(targetPath);
+		}
 	}
 </script>
 
-<button class="chat-item" style="padding-left: {level * 1.25}rem;" on:click={handleClick}>
+<button class="chat-item" style="padding-left: {level * 1.25}rem;" onclick={handleClick}>
   <span class="icon">
     {#if hasChildren}
-      {#if open}
+      {#if isOpen}
 				<ChevronDown size="16" />
 			{:else}
 				<ChevronRight size="16" />
@@ -44,16 +72,17 @@
 </button>
 
 
-	{#if open && hasChildren}
-		<div class="nested">
-			{#each Object.entries(subtree) as [childName, childSubtree]}
-				<FolderNode name={childName}
-										subtree={childSubtree}
-										level={level + 1}
-										fullPath={`${fullPath}/${childName}`} />
-			{/each}
-		</div>
-	{/if}
+{#if isOpen && hasChildren}
+	<div class="nested">
+		{#each Object.entries(subtree) as [childName, childSubtree]}
+			<FolderNode name={childName}
+									subtree={childSubtree}
+									level={level + 1}
+									fullPath={`${fullPath}/${childName}`}
+			/>
+		{/each}
+	</div>
+{/if}
 
 <style>
     .chat-item {

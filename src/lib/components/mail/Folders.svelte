@@ -1,9 +1,18 @@
 <script lang="ts">
 	import FolderNode from './FolderNode.svelte';
-	export let folders: string[];
+
+	let {
+		folders = [],
+	} = $props();
+
 
 	function createFolderTree(paths: string[]): Record<string, any> {
 		const root: Record<string, any> = {};
+		if (!Array.isArray(paths) || paths.length === 0) {
+			console.log('No folders to process or folders is not an array');
+			return root;
+		}
+
 		paths.sort();
 		for (const path of paths) {
 			const segments = path.split('/');
