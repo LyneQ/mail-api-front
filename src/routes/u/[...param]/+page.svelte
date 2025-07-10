@@ -7,8 +7,6 @@
 	let isLoading = $state(true);
 	const param = page.params.param.split('/');
 
-	const accountNumber = param[0];
-	const folderName = param[1];
 	const accountFolders: string[] = [];
 	const inboxMessages = [];
 
@@ -25,7 +23,10 @@
 				accountFolders.push(...filteredFolders);
 				inboxMessages.push(...body?.inbox);
 			}
+
+			console.log(response);
 		} catch (err) {
+			console.log("error");
 			console.log(err);
 		}
 		isLoading = false;

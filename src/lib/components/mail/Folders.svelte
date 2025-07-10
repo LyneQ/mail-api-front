@@ -64,9 +64,14 @@
 	}
 </script>
 
-<div class="folder-list" on:click={handleClick}>
+<button
+	class="folder-list"
+	aria-controls="mail-content"
+	onclick={handleClick}
+	tabindex="0"
+>
 	{@html renderFolderTree(folderTree)}
-</div>
+</button>
 
 <style lang="scss">
   .folder-list {
