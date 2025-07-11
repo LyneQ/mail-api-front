@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import '~/variable.css';
+	import { config } from '$lib/stores/config';
 	import { page } from '$app/state';
 	import { ModeWatcher } from 'mode-watcher';
 	import useAuth from '$lib/composables/useAuth';
@@ -24,7 +25,7 @@
 
 const pathname = page.url.pathname
 	async function logout() {
-		await fetch('http://localhost:1323/api/signout', {
+		await fetch(`${$config.apiUrl}signout`, {
 			method: "GET",
 			credentials: "include"
 		})
@@ -58,7 +59,7 @@ const pathname = page.url.pathname
 	<header>
 		<nav id="nav">
 			<h1 id="logo">
-				<a href="/"> Mail-Api</a>
+				<a href="/"> {$config.appName}</a>
 			</h1>
 			<div class="auth">
 				{#if !$isLoggedIn }

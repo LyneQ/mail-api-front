@@ -2,6 +2,8 @@
 	import { page } from '$app/state';
 	import Folders from '../../../lib/components/mail/Folders.svelte';
 	import InboxMessages from '../../../lib/components/mail/InboxMessages.svelte';
+	import { config } from '$lib/stores/config';
+	import { get } from 'svelte/store';
 
 	let { data } = $props();
 	let isLoading = $state(true);
@@ -11,12 +13,14 @@
 	let inboxMessages = $state([]);
 	let mailBox = $state(null);
 
+	const { apiUrl } = get(config);
+
 
 	async function fetchData(folderPath: string) {
 		isLoading = true;
 		try {
 
-			const inboxResponse = await fetch(`http://localhost:1323/api/email/inbox`, {
+			const inboxResponse = await fetch(`${apiUrl}email/inbox`, {
 				method: 'GET',
 				credentials: 'include'
 			});
@@ -25,7 +29,7 @@
 				const body = await inboxResponse.json();
 
 
-				specialFolders = ['inbox', 'sent', 'drafts', 'trash', 'spam'];
+				specialFolders = ['inbox', 'sent', 'drafts', 'trash', 'spam', 'All Mail'];
 
 
 				regularFolders = [];
@@ -42,18 +46,29 @@
 				console.log('API request failed with status:', inboxResponse.status);
 			}
 
-			const specialFoldersList = ['inbox', 'sent', 'drafts', 'trash', 'spam'];
+			const specialFoldersList = ['inbox', 'sent', 'drafts', 'trash', 'spam', 'all mail'];
 			const folderName = specialFoldersList.includes(folderPath.toLowerCase()) 
 				? folderPath.charAt(0).toUpperCase() + folderPath.slice(1)
 				: `Folders/${folderPath}`;
-			const messagesResponse = await fetch(`http://localhost:1323/api/email/folder?name=${folderName}`, {
+			const messagesResponse = await fetch(`${apiUrl}email/folder?name=${folderName}`, {
 				method: 'GET',
 				credentials: 'include'
 			});
 
 			if (messagesResponse.status === 200) {
-				const messages = await messagesResponse.json();
-				inboxMessages = messages || [];
+				const messagesData = await messagesResponse.json();
+
+				if (messagesData && typeof messagesData === 'object') {
+					if ('messages' in messagesData) {
+						inboxMessages = messagesData.messages || [];
+					} else if ('data' in messagesData) {
+						inboxMessages = messagesData.data || [];
+					} else {
+						inboxMessages = messagesData || [];
+					}
+				} else {
+					inboxMessages = messagesData || [];
+				}
 			}
 		} catch (err) {
 			console.log("error");

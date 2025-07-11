@@ -10,6 +10,8 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
+	import { config } from '$lib/stores/config';
+
 
 	let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } =
 		$props();
@@ -24,7 +26,7 @@
 
 	async function login(username: string, password: string) {
 		try {
-			const response = await fetch('http://localhost:1323/api/signin', {
+			const response = await fetch($config.apiUrl + 'signin', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -34,14 +36,12 @@
 			});
 
 			if (response.status !== 200) {
-				// Handle HTTP errors
 				const errorData = await response.json();
 				errorMessage.set(errorData.message || 'Login failed');
 				return;
 			}
 			await goto('/u/0/inbox')
 
-			// Optional: redirect or perform other actions
 		} catch (err) {
 			errorMessage.set('An error occurred during login');
 			console.error(err);
