@@ -1,9 +1,10 @@
 <script lang="ts">
+  import type { Message } from '$lib/types/Message';
   // Props to receive the messages data
-  let { messages = [] } = $props();
+  let { messages = [] } = $props<Message[]>();
 
   // Create a derived state for sorted messages
-  let sortedMessages = $state([]);
+  let sortedMessages = $state<Message[]>([]);
 
   // Sort messages by date (most recent first)
   $effect(() => {
@@ -25,6 +26,11 @@
       minute: '2-digit'
     });
   }
+
+  // Check if a message has been seen (has /seen tag)
+  function isMessageSeen(message: Message): boolean {
+    return message.labels && message.labels.includes('\\Seen');
+  }
 </script>
 
 <div class="inbox-container">
@@ -35,7 +41,7 @@
   {:else}
     <div class="message-list">
       {#each sortedMessages as message}
-        <div class="message-item">
+        <div class="message-item {!isMessageSeen(message) ? 'unseen' : ''}">
           <div class="message-header">
             <div class="message-from">{message.from}</div>
             <div class="message-date">{formatDate(message.date)}</div>
@@ -49,6 +55,9 @@
 </div>
 
 <style lang="scss">
+
+  $unseen-color: #607fe6;
+
   .inbox-container {
     width: 100%;
     height: calc(100vh - 4.3rem);
@@ -85,6 +94,12 @@
 
     &:hover {
       background-color: var(--secondary);
+    }
+
+    &.unseen {
+      border-left: 4px solid var(--v-primary);
+      font-weight: 600;
+      background-color: var(--primary-foreground, #f5f5f5);
     }
   }
 
